@@ -66,6 +66,16 @@ then the directory is `user/data/sqlite`.
 >NOTE: The database must exist. If it does not, then an error is generated.    
 `logging` should not be used in production settings as it writes to the hard drive, slowing performance.
 
+An additional configuration is available to set [Sqlite3 pragma options](https://www.sqlite.org/pragma.html). Define pragma options using either the `pragmata` or `pragma` header (interchangeable), whose value is [pragma-stmt](https://www.sqlite.org/syntax/pragma-stmt.html)/[pragma-value](https://www.sqlite.org/syntax/pragma-value.html) pairs in YAML. For example:
+
+```yaml
+pragmata:
+  foreign_keys: true
+  encoding: 'UTF-16'
+```
+
+>NOTES: Invalid `PRAGMA` names or values may trigger runtime errors. Pragma values are all quoted as strings for the `PRAGMA` statement, which Sqlite3 seems to interpret as intended (e.g. booleans).
+
 ### Per page configuration
 * Shortcodes can be enabled separately using the `shortcode-core` configuration. To disable shortcodes being used on all pages, but only used on selected pages, configure the shortcode-core plugin inside the Admin panel with `enabled=true` and `active=false`. Then on each page where shortcodes are used, include in the front section of the page:
 ```yaml

@@ -42,7 +42,7 @@ class SqlitePlugin extends Plugin
                                                 )
                                             );
         $this->sqlite['extraSecurity'] = $this->config->get('plugins.sqlite.extra_security');
-        $this->sqlite['pragmata'] = $this->config->get('plugins.sqlite.pragmata', []);
+        $this->sqlite['pragmata'] = $this->config->get('plugins.sqlite.pragmata', $this->config->get('plugins.sqlite.pragma', [] ));
         $dbloc = $path . DS . $dbname;
         if ( file_exists($dbloc) ) {
             $this->sqlite['db'] = new SQLite3($dbloc);
