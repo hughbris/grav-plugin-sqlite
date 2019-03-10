@@ -49,6 +49,7 @@ class SqlitePlugin extends Plugin
         } else {
             $this->sqlite['error'] = "No database found at --user://$route/$dbname--";
         }
+        $this->sqlite['utils'] = new Sqlite_utilities();
         $this->grav['sqlite'] = $this->sqlite;
         $this->enable([
             'onShortcodeHandlers' => ['onShortcodeHandlers', 0],
@@ -215,5 +216,24 @@ class SqlitePlugin extends Plugin
                 chmod($path, 0664);
             }
         }
+    }
+}
+
+class Sqlite_utilities {
+
+    public static function queryResults($query, $params) {
+        global $grav;
+        $db = $grav['sqlite']['db'];
+        $statement = $db->prepare($query);
+        foreach( $params as $param => $val) {
+            $statement->bindValue($param, $val);
+        }
+        $result = $statement->execute();
+        $result->finalize();
+        $ret = array();
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $ret[] = $row;
+        }
+        return $ret;
     }
 }
