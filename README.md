@@ -248,8 +248,8 @@ Utility methods are available under the object `grav.sqlite.utils` for accessing
 
 Methods available:
 
-* `queryResultObject(query, params)`. Returns an instance of the [SQLite3Result class](https://php.net/manual/en/class.sqlite3result.php). *Note that this has limited use within Twig it only supports incremental access to this object **and** because Twig has no `while` construct.* The utility method `queryResultArray`, with the same parameters, wraps this method and loads an array for use in Twig. The `queryResultObject` method by itself is mainly likely to be useful from PHP.
-* `queryResultArray(query, params)`. Returns a zero-indexed array of result rows from a PDO query (`query`) with placeholder parameters (`$params`). Each returned row is an associative array of `columnName`-indexed values. It is useful if you want more/*ad hoc* control of data display, or to access data from Twig templates rather than in the page content using shortcodes.
+* `queryResultObject(query, params)`. Returns an instance of the [SQLite3Result class](https://php.net/manual/en/class.sqlite3result.php). *Note that this class has limited use within Twig because it only supports incremental access to result rows **and** because Twig has no `while` construct.* The utility method `queryResultArray`, with the same parameters, wraps this method and loads an array for use in Twig. The `queryResultObject` method by itself is more likely to be useful from PHP, if at all.
+* `queryResultArray(query, params)`. Returns a zero-indexed array of result rows from a PDO query (`query`) with placeholder parameters (`params`). Each returned row is an associative array of `columnName`-indexed values. It is useful if you want more control of data display, or to access data from Twig templates rather than in the page content using shortcodes.
 
 #### Example
 
