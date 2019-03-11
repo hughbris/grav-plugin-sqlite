@@ -263,9 +263,9 @@ Display selected data in a custom table format:
 {% if results is not empty %}
     <table>
         <thead>
-            <tr axis="col">
+            <tr>
             {% for col in results[0]|keys %}
-                <th>{{ col }}</th>
+                <th axis="col">{{ col }}</th>
             {% endfor %}
             </tr>
         </thead>
