@@ -221,8 +221,9 @@ class SqlitePlugin extends Plugin
 
 class Sqlite_utilities {
 
-    public static function queryResults($query, $params) {
+    public function queryResultObject($query, $params) {
         global $grav;
+
         $db = $grav['sqlite']['db'];
         $statement = $db->prepare($query);
         foreach( $params as $param => $val) {
@@ -230,10 +231,18 @@ class Sqlite_utilities {
         }
         $result = $statement->execute();
         $result->finalize();
+
+        return $result; // though this returns FALSE on error, an exception seems to be thrown from limited experiments, which is good
+    }
+
+    public function queryResultArray($query, $params) {
+
+        $result = $this->queryResultObject($query, $params); // refer note in queryResultObject method re exception handling
         $ret = array();
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
             $ret[] = $row;
         }
+
         return $ret;
     }
 }
