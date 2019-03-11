@@ -1,6 +1,6 @@
 # Sqlite Plugin
 
-The **Sqlite** Plugin is for [Grav CMS](http://github.com/getgrav/grav). The shortcode `[sql-table]` and the ***Form*** actions `sql-insert` and `sql-update`  are provided to interact with an ***Sqlite3*** database.
+The **Sqlite** Plugin is for [Grav CMS](http://github.com/getgrav/grav). The shortcode `[sql-table]`, Twig utility functions, and the ***Form*** actions `sql-insert` and `sql-update`  are provided to interact with an ***Sqlite3*** database.
 
 ## Installation
 
@@ -48,6 +48,7 @@ select_logging: false
 insert_logging: false
 update_logging: false
 ```
+
 - `enabled` turns on the plugin for the whole site. If `false`, then making it active on a page will have no effect.  
 - `database_route` is the Grav route (relative to the 'user' subdirectory) to the location of the `SQLite3` database.  
 - `database_name` is the full name (typically with the extension .sqlite3) of the database file. It is the responsibility of the site developer/maintainer to create the database.
@@ -78,9 +79,11 @@ sqliteSelect: allow
 ```
 
 ## Usage
-A shortcode and a Form action are provided.
+A shortcode, Twig utility functions, and form actions are provided.
+
 1. `[sql-table]` to generate a table (or ***json*** string) from data in the database
-2. the `sql-insert` action for a ***Form*** is used to move data from a form to the database.
+1. `grav.sqlite.utils` for running [queries using the PDO API](https://php.net/manual/en/class.sqlite3stmt.php) and accessing the results via Twig (or PHP)
+1. the `sql-insert` action for a ***Form*** is used to move data from a form to the database.
 1. the `sql-update` action for a ***Form*** is used to update an existing row of data in the database.
 
 When the plugin is first initialised, it verifies that the database exists. If it does not exist, then every instance of the `[sql-table]` shortcode is replaced with an error message and the Form generates an error message when the submit button is pressed.
@@ -238,6 +241,48 @@ This will be rendered by the `sqlite-plugin` as
 ```
 
 When this option is used, the values of the other options `class`, `id`, or `hidden` are ignored because they only have significance for an **HTML** `<table>`.
+
+### Twig utility functions `grav.sqlite.utils`
+
+Utility methods are available under the object `grav.sqlite.utils` for accessing data in Twig (or in PHP using `$grav['sqlite']['utils']`).
+
+Methods available:
+
+* `queryResultObject(query, params)`. Returns an instance of the [SQLite3Result class](https://php.net/manual/en/class.sqlite3result.php). *Note that this has limited use within Twig it only supports incremental access to this object **and** because Twig has no `while` construct.* The utility method `queryResultArray`, with the same parameters, wraps this method and loads an array for use in Twig. The `queryResultObject` method by itself is mainly likely to be useful from PHP.
+* `queryResultArray(query, params)`. Returns a zero-indexed array of result rows from a PDO query (`query`) with placeholder parameters (`$params`). Each returned row is an associative array of `columnName`-indexed values. It is useful if you want more/*ad hoc* control of data display, or to access data from Twig templates rather than in the page content using shortcodes.
+
+#### Example
+
+Display selected data in a custom table format:
+
+```twig
+{% set query = 'SELECT * FROM llamas WHERE `name` LIKE :name;' %}
+{% set params = {'name': '%alpha%'} %}
+{% set results = grav.sqlite.utils.queryResultArray(query, params) %}
+
+{% if results is not empty %}
+    <table>
+        <thead>
+            <tr axis="col">
+            {% for col in results[0]|keys %}
+                <th>{{ col }}</th>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in results %}
+            <tr>
+            {% for val in row %}
+                <td>{{ val }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Came up empty!</p>
+{% endif %}
+```
 
 ### Form Action `sql-insert`
 A GRAV form is created within the page as described by the GRAV documentation. However, the `process` list contains the word `sql-insert`.
