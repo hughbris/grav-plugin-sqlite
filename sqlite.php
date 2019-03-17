@@ -42,10 +42,12 @@ class SqlitePlugin extends Plugin
                                                 )
                                             );
         $this->sqlite['extraSecurity'] = $this->config->get('plugins.sqlite.extra_security');
+        $this->sqlite['pragmata'] = $this->config->get('plugins.sqlite.pragmata', $this->config->get('plugins.sqlite.pragma', [] ));
         $dbloc = $path . DS . $dbname;
         if ( file_exists($dbloc) ) {
             $this->sqlite['db'] = new SQLite3($dbloc);
             $this->sqlite['db']->enableExceptions(true);
+            $this->setPragmata($this->sqlite['db'], $this->sqlite['pragmata']);
         } else {
             $this->sqlite['error'] = "No database found at --user://$route/$dbname--";
         }
@@ -220,6 +222,13 @@ class SqlitePlugin extends Plugin
             }
         }
     }
+
+    private function setPragmata($conn, $pragmata=[]) {
+        foreach ($pragmata as $pragma => $val) {
+            $conn->exec("PRAGMA $pragma = '$val';");
+        }
+    }
+
 }
 
 class Sqlite_utilities {
